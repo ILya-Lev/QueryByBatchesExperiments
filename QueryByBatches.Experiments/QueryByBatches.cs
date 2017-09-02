@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
-namespace QueryByBatchesExperiments
+namespace QueryByBatches.Experiments
 {
 	public class QueryByBatches
 	{
@@ -18,9 +18,6 @@ namespace QueryByBatchesExperiments
 		/// consider splitting the implementation into 2 private methods - one for initial query.Count == 0 
 		/// another - != 0
 		/// </summary>
-		/// <param name="query"></param>
-		/// <param name="batchSize"></param>
-		/// <returns></returns>
 		public IEnumerable<int> RetrieveByBatches(Query query, int batchSize)
 		{
 			var expectedTotal = query.Count;

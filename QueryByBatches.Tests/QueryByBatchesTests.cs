@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Moq;
-using QueryByBatchesExperiments;
+using QueryByBatches.Experiments;
 using System.Linq;
 using Xunit;
 
@@ -9,13 +9,13 @@ namespace QueryByBatches.Tests
 	public class QueryByBatchesTests
 	{
 		private IExceptionStrategy _exceptionStrategy;
-		private QueryByBatchesExperiments.QueryByBatches _queryByBatches;
+		private Experiments.QueryByBatches _queryByBatches;
 		private const int ItemsInStorage = 100;
 
 		public QueryByBatchesTests()
 		{
 			var client = new ServiceClient(() => _exceptionStrategy, ItemsInStorage);
-			_queryByBatches = new QueryByBatchesExperiments.QueryByBatches(client);
+			_queryByBatches = new Experiments.QueryByBatches(client);
 		}
 
 		[Fact]

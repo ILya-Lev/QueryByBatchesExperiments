@@ -1,4 +1,4 @@
-﻿namespace QueryByBatchesExperiments
+﻿namespace QueryByBatches.Experiments
 {
 	class Program
 	{

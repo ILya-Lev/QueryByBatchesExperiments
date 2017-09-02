@@ -82,9 +82,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ConsoleApplication1\QueryByBatchesExperiments.csproj">
-      <Project>{EFA2C956-0E57-496A-9BA6-E1337FFFD6A4}</Project>
-      <Name>QueryByBatchesExperiments</Name>
+    <ProjectReference Include="..\QueryByBatches.Experiments\QueryByBatches.Experiments.csproj">
+      <Project>{efa2c956-0e57-496a-9ba6-e1337fffd6a4}</Project>
+      <Name>QueryByBatches.Experiments</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
