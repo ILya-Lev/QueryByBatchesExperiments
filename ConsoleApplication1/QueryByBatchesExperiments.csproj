@@ -7,8 +7,8 @@
     <ProjectGuid>{EFA2C956-0E57-496A-9BA6-E1337FFFD6A4}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConsoleApplication1</RootNamespace>
-    <AssemblyName>ConsoleApplication1</AssemblyName>
+    <RootNamespace>QueryByBatchesExperiments</RootNamespace>
+    <AssemblyName>QueryByBatchesExperiments</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
