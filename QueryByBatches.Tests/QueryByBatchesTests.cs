@@ -32,6 +32,7 @@ namespace QueryByBatches.Tests
 
 			sequence.Should().HaveCount(12);
 			sequence.Should().BeInAscendingOrder();
+			query.TimesCountChanged.Should().BeLessOrEqualTo(12 / 4 + 1);
 		}
 
 		[Fact]
@@ -48,14 +49,15 @@ namespace QueryByBatches.Tests
 
 			sequence.Should().HaveCount(12);
 			sequence.Should().BeInAscendingOrder();
+			query.TimesCountChanged.Should().BeLessOrEqualTo(12 / 5 + 2);
 		}
 
 		[Fact]
 		public void RetrieveByBatches_ExceptionAtDoubleInitBatch_ReturnsExpectedAmount()
 		{
 			var strategySetup = new Mock<IExceptionStrategy>(MockBehavior.Strict);
-			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count == 8))).Returns(true);
-			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count != 8))).Returns(false);
+			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count >= 8))).Returns(true);
+			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count < 8))).Returns(false);
 			_exceptionStrategy = strategySetup.Object;
 
 			var batchSize = 4;
@@ -65,14 +67,15 @@ namespace QueryByBatches.Tests
 
 			sequence.Should().HaveCount(21);
 			sequence.Should().BeInAscendingOrder();
+			query.TimesCountChanged.Should().BeLessOrEqualTo(21 / 4 + 2);
 		}
 
 		[Fact]
 		public void RetrieveByBatches_ExceptionAtInitBatch_ReturnsExpectedAmount()
 		{
 			var strategySetup = new Mock<IExceptionStrategy>(MockBehavior.Strict);
-			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count == 4))).Returns(true);
-			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count != 4))).Returns(false);
+			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count >= 4))).Returns(true);
+			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count < 4))).Returns(false);
 			_exceptionStrategy = strategySetup.Object;
 
 			var batchSize = 4;
@@ -82,6 +85,7 @@ namespace QueryByBatches.Tests
 
 			sequence.Should().HaveCount(21);
 			sequence.Should().BeInAscendingOrder();
+			query.TimesCountChanged.Should().BeLessOrEqualTo(21 / 2 + 1);
 		}
 
 		[Fact]
@@ -98,6 +102,7 @@ namespace QueryByBatches.Tests
 
 			sequence.Should().HaveCount(ItemsInStorage);
 			sequence.Should().BeInAscendingOrder();
+			query.TimesCountChanged.Should().BeLessOrEqualTo(7);
 		}
 
 		[Fact]
@@ -114,14 +119,15 @@ namespace QueryByBatches.Tests
 
 			sequence.Should().HaveCount(ItemsInStorage);
 			sequence.Should().BeInAscendingOrder();
+			query.TimesCountChanged.Should().BeLessOrEqualTo(6);
 		}
 
 		[Fact]
 		public void RetrieveByBatches_ExceptionAtDoubleInitBatchZeroCount_ReturnsExpectedAmount()
 		{
 			var strategySetup = new Mock<IExceptionStrategy>(MockBehavior.Strict);
-			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count == 8))).Returns(true);
-			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count != 8))).Returns(false);
+			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count >= 8))).Returns(true);
+			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count < 8))).Returns(false);
 			_exceptionStrategy = strategySetup.Object;
 
 			var batchSize = 4;
@@ -131,14 +137,15 @@ namespace QueryByBatches.Tests
 
 			sequence.Should().HaveCount(ItemsInStorage);
 			sequence.Should().BeInAscendingOrder();
+			query.TimesCountChanged.Should().BeLessOrEqualTo(19);
 		}
 
 		[Fact]
 		public void RetrieveByBatches_ExceptionAtInitBatchZeroCount_ReturnsExpectedAmount()
 		{
 			var strategySetup = new Mock<IExceptionStrategy>(MockBehavior.Strict);
-			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count == 4))).Returns(true);
-			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count != 4))).Returns(false);
+			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count >= 4))).Returns(true);
+			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count < 4))).Returns(false);
 			_exceptionStrategy = strategySetup.Object;
 
 			var batchSize = 4;
@@ -148,6 +155,25 @@ namespace QueryByBatches.Tests
 
 			sequence.Should().HaveCount(ItemsInStorage);
 			sequence.Should().BeInAscendingOrder();
+			query.TimesCountChanged.Should().BeLessOrEqualTo(38);
+		}
+
+		[Fact]
+		public void RetrieveByBatches_ExceptionAtInitBatchSecondTimeZeroCount_ReturnsExpectedAmount()
+		{
+			var strategySetup = new Mock<IExceptionStrategy>(MockBehavior.Strict);
+			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count >= 4 && q.FirstIndex != 0))).Returns(true);
+			strategySetup.Setup(str => str.ShouldThrowException(It.Is<Query>(q => q.Count < 4 || q.FirstIndex == 0))).Returns(false);
+			_exceptionStrategy = strategySetup.Object;
+
+			var batchSize = 4;
+			var query = new Query { Count = 0 };
+
+			var sequence = _queryByBatches.RetrieveByBatches(query, batchSize).ToList();
+
+			sequence.Should().HaveCount(ItemsInStorage);
+			sequence.Should().BeInAscendingOrder();
+			query.TimesCountChanged.Should().BeLessOrEqualTo(41);
 		}
 	}
 }

@@ -8,6 +8,8 @@ namespace QueryByBatches.Experiments
 	public class QueryByBatches
 	{
 		private readonly ServiceClient _client;
+		//private static readonly double factor = (Math.Sqrt(5) + 1) / 2;
+		private static readonly double factor = 2;
 
 		public QueryByBatches(ServiceClient client)
 		{
@@ -44,6 +46,32 @@ namespace QueryByBatches.Experiments
 		}
 
 		/// <summary> binary search of optimal batch size </summary>
+		//private IList<int> RetieveBatch(Query query, ref int step, ref int previousFailSize)
+		//{
+		//	if (step == 0)
+		//		step = query.Count;
+		//	while (true)
+		//	{
+		//		try
+		//		{
+		//			var batch = _client.RetrieveMultiple(query).ToList();
+
+		//			step = step < 0 ? -step / 2 : step / 2;
+		//			query.Count += step;
+		//			return batch;
+		//		}
+		//		catch (WebException webException) when (webException.Message.Contains("timeout"))
+		//		{
+		//			Console.WriteLine(webException);
+
+		//			if (query.Count < 2)
+		//				throw;
+
+		//			step = step > 0 ? -step / 2 : step / 2;
+		//			query.Count += step;
+		//		}
+		//	}
+		//}
 		private IList<int> RetieveBatch(Query query, ref int previousSuccessSize, ref int previousFailSize)
 		{
 			while (true)
@@ -53,10 +81,7 @@ namespace QueryByBatches.Experiments
 					var batch = _client.RetrieveMultiple(query).ToList();
 
 					previousSuccessSize = query.Count;
-					if (previousFailSize == 0)
-						query.Count *= 2;
-					else
-						query.Count = (previousFailSize + query.Count) / 2;
+					query.Count = IncreaseBatchSize(previousFailSize, query.Count);
 					return batch;
 				}
 				catch (WebException webException) when (webException.Message.Contains("timeout"))
@@ -67,12 +92,24 @@ namespace QueryByBatches.Experiments
 					if (query.Count < 2)
 						throw;
 
-					if (previousSuccessSize == 0)
-						query.Count /= 2;
+					if (previousSuccessSize >= query.Count)
+						query.Count = DecreaseBatchSize(0, query.Count);
 					else
-						query.Count = (query.Count + previousSuccessSize) / 2;
+						query.Count = DecreaseBatchSize(previousSuccessSize, query.Count);
 				}
 			}
+		}
+
+		int IncreaseBatchSize(int upperBound, int currentBatchSize)
+		{
+			if (upperBound == 0)
+				return (int) (currentBatchSize * factor);
+			return (int) ((currentBatchSize * (factor - 1) + upperBound) / factor);
+		}
+
+		int DecreaseBatchSize(int lowerBound, int currentBatchSize)
+		{
+			return (int) ((lowerBound * (factor - 1) + currentBatchSize) / factor);
 		}
 	}
 }
